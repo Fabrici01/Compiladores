@@ -1,7 +1,6 @@
 import java.util.List;
 import javax.swing.SwingUtilities;
 
-/** Raiz de composição: cria os objetos concretos e os conecta (Inversão de Dependência). */
 public class Aplicacao {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

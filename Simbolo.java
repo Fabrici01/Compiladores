@@ -1,10 +1,23 @@
-/** Modelo: uma linha da tabela de símbolos. */
-final class Simbolo {
-    private final String nome, categoria, primeiraLinha;
-    Simbolo(String nome, String categoria, String primeiraLinha) {
-        this.nome = nome; this.categoria = categoria; this.primeiraLinha = primeiraLinha;
+public final class Simbolo {
+    private final String nome;
+    private final String categoria;
+    private final String primeiraLinha;
+
+    public Simbolo(String nome, String categoria, String primeiraLinha){
+        this.nome = nome;
+        this.categoria = categoria;
+        this.primeiraLinha = primeiraLinha;       
     }
-    String getNome() { return nome; }
-    String getCategoria() { return categoria; }
-    String getPrimeiraLinha() { return primeiraLinha; }
+
+    public String getNome(){
+        return nome; 
+    }
+
+    public String getCategoria(){
+        return categoria; 
+    }
+
+    public String getPrimeiraLinha(){ 
+        return primeiraLinha; 
+    }
 }

@@ -1,6 +1,6 @@
 import java.util.List;
 
-/** Estratégia de aviso: novas regras são adicionadas sem alterar o analisador (Aberto/Fechado). */
-interface RegraAviso {
+// Aplicando o Strategy nos Avisos
+public interface RegraAviso {
     List<Mensagem> verificar(List<Token> tokens);
 }

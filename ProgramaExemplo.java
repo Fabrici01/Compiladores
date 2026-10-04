@@ -1,6 +1,4 @@
-/** Programa de demonstração carregado no editor. */
-final class ProgramaExemplo {
-    private ProgramaExemplo() {}
+public final class ProgramaExemplo {
     static final String TEXTO = """
         program Demo;
         const max = 10;
