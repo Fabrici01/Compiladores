@@ -19,7 +19,7 @@ public final class JanelaPrincipal implements VisaoEditor, VisaoResultados {
     private final PintorSublinhadoOndulado pintorAviso = new PintorSublinhadoOndulado(new Color(230, 140, 0));
     private PresenterAnalise presenter;
 
-    JanelaPrincipal(){
+    public JanelaPrincipal(){
         editor.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14)); 
         editor.setTabSize(2);
         listaMensagens.setCellRenderer(new DefaultListCellRenderer() {
@@ -78,7 +78,10 @@ public final class JanelaPrincipal implements VisaoEditor, VisaoResultados {
         abas.add("Tokens", new JScrollPane(new JTable(modeloTokens)));
         abas.add("Tabela de símbolos", new JScrollPane(new JTable(modeloSimbolos)));
         
-        JSplitPane divisor = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(editor), abas);
+        JScrollPane rolagemEditor = new JScrollPane(editor);
+        rolagemEditor.setRowHeaderView(new NumeracaoLinhas(editor));
+
+        JSplitPane divisor = new JSplitPane(JSplitPane.VERTICAL_SPLIT, rolagemEditor, abas);
         divisor.setResizeWeight(0.6);
         janela.add(barra, BorderLayout.NORTH); janela.add(divisor);
         janela.setSize(900, 700); janela.setLocationRelativeTo(null);
