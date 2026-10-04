@@ -3,7 +3,7 @@ import java.util.*;
 public final class Vocabulario {
     public static final Set<String> PALAVRAS_RESERVADAS = new LinkedHashSet<>(Arrays.asList(
         ("PROGRAM BEGIN END CONST VAR INTEGER REAL CHAR STRING PROCEDURE FUNCTION IF THEN ELSE WHILE DO "
-        + "REPEAT UNTIL BREAK CONTINUE FOR TO DOWNTO OU E").split(" ")));
+        + "REPEAT UNTIL BREAK CONTINUE FOR TO DOWNTO OU E TYPE RECORD").split(" ")));
 
     public static final String[] OPERADORES_DUPLOS = {":=", "<>", "<=", ">="};
     
