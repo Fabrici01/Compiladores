@@ -6,14 +6,16 @@ public final class Mensagem {
     
     private final Severidade severidade;
     private final String texto;
-    
-    public Mensagem(int inicio, int fim, int linha, int coluna, Severidade severidade, String texto){
+    private final String tipo;
+
+    public Mensagem(int inicio, int fim, int linha, int coluna, Severidade severidade, String texto, String tipo) {
         this.inicio = inicio;
         this.fim = Math.max(fim, inicio + 1);
         this.linha = linha;
         this.coluna = coluna;
         this.severidade = severidade;
         this.texto = texto;
+        this.tipo = tipo;
     }
 
     public int getInicio(){ 
@@ -30,6 +32,6 @@ public final class Mensagem {
     
     @Override 
     public String toString(){ 
-        return "[" + linha + ":" + coluna + "] " + texto; 
+        return "[" + linha + ":" + coluna + "] " +tipo +": " + texto; 
     }
 }

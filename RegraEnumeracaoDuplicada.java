@@ -36,7 +36,7 @@ public final class RegraEnumeracaoDuplicada implements RegraAviso {
             if(t.getTipo().equals("ID") && !vistas.add(t.getAtributo())){
                 avisos.add(new Mensagem(t.getInicio(), t.getFim(), t.getLinha(), t.getColuna(),
                     Severidade.AVISO,
-                    "Warning: constante '" + t.getLexema() + "' repetida na enumeração"));
+                    "Constante '" + t.getLexema() + "' repetida na enumeração", "Aviso"));
             }
             k++;
         }

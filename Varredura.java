@@ -50,8 +50,12 @@ public final class Varredura {
         return ehLetra(c) || ehDigito(c) || c == '_';
     }
 
-    private void registrarErro(int ini, int fim, int lin, int col, String texto) {
-        mensagens.add(new Mensagem(ini, fim, lin, col, Severidade.ERRO, texto));
+    private void registrarErroLexico(int ini, int fim, int lin, int col, String texto) {
+        mensagens.add(new Mensagem(ini, fim, lin, col, Severidade.ERRO, texto, "Erro Léxico"));
+    }
+
+    private void registrarErroSintatico(int ini, int fim, int lin, int col, String texto) {
+        mensagens.add(new Mensagem(ini, fim, lin, col, Severidade.ERRO, texto, "Erro Sintático"));
     }
 
     private void criarToken(String tipo, int ini, int lin, int col, String atributo) {
@@ -89,7 +93,7 @@ public final class Varredura {
             }
             avancar();
         }
-        registrarErro(ini, ini + (abertura == '{' ? 1 : 2), lin, col, "Comentário não fechado");
+        registrarErroLexico(ini, ini + (abertura == '{' ? 1 : 2), lin, col, "Comentário não fechado");
     }
 
     private void lerIdentificadorOuReservada(int ini, int lin, int col){
@@ -101,7 +105,7 @@ public final class Varredura {
         String maiuscula = palavra.toUpperCase();
 
         if(palavra.length() > Vocabulario.TAMANHO_MAXIMO_IDENTIFICADOR){
-            registrarErro(ini, posicao, lin, col, "Identificador '" + palavra + "' excede "
+            registrarErroLexico(ini, posicao, lin, col, "Identificador '" + palavra + "' excede "
                 + Vocabulario.TAMANHO_MAXIMO_IDENTIFICADOR + " caracteres");
 
         } else if (Vocabulario.PALAVRAS_RESERVADAS.contains(maiuscula)){
@@ -128,7 +132,7 @@ public final class Varredura {
                 avancar();
             }
 
-            registrarErro(ini, posicao, lin, col, "Número mal formado (identificador não pode começar com dígito)");
+            registrarErroLexico(ini, posicao, lin, col, "Número mal formado (identificador não pode começar com dígito)");
             return;
         }
         criarToken("NUM", ini, lin, col, texto.substring(ini, posicao));
@@ -144,7 +148,7 @@ public final class Varredura {
             avancar(); 
             criarToken("LITERAL", ini, lin, col, texto.substring(ini + 1, posicao - 1));
         }else{ 
-            registrarErro(ini, posicao, lin, col, "Literal não fechado");
+            registrarErroLexico(ini, posicao, lin, col, "Literal não fechado");
         }
     }
 
@@ -172,7 +176,7 @@ public final class Varredura {
                 && Vocabulario.DELIMITADORES_SINCRONIZACAO.indexOf(atual()) < 0){
             avancar();
         }
-        registrarErro(ini, posicao, lin, col, "Caractere inválido '" + invalido + "'");
+        registrarErroLexico(ini, posicao, lin, col, "Caractere inválido '" + invalido + "'");
     }
 
     private void lerEOF(int ini, int lin, int col){

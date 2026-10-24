@@ -14,7 +14,7 @@ public final class RegraInstrucaoSemEfeito implements RegraAviso {
                 
                 avisos.add(new Mensagem(atual.getInicio(), atual.getFim(), atual.getLinha(), atual.getColuna(),
                     Severidade.AVISO,
-                    "Warning: instrução com somente o identificador '" + atual.getLexema() + "' não tem efeito"));
+                    "Instrução com somente o identificador '" + atual.getLexema() + "' não tem efeito", "Aviso"));
             }
         }
         return avisos;
