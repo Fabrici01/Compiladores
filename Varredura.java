@@ -54,10 +54,6 @@ public final class Varredura {
         mensagens.add(new Mensagem(ini, fim, lin, col, Severidade.ERRO, texto, "Erro Léxico"));
     }
 
-    private void registrarErroSintatico(int ini, int fim, int lin, int col, String texto) {
-        mensagens.add(new Mensagem(ini, fim, lin, col, Severidade.ERRO, texto, "Erro Sintático"));
-    }
-
     private void criarToken(String tipo, int ini, int lin, int col, String atributo) {
         tokens.add(new Token(tipo, texto.substring(ini, posicao), lin, col, ini, posicao, atributo));
     }
@@ -185,11 +181,12 @@ public final class Varredura {
 
     //Simula o AFD escolhendo o caminho pelo primeiro caractere.
     public void executar() {
-        char c = atual(); 
-        int ini = posicao;
-        int lin = linha;
-        int col = coluna;
         while(posicao < tamanho) {
+            char c = atual(); 
+            int ini = posicao;
+            int lin = linha;
+            int col = coluna;
+
             if(Character.isWhitespace(c)){ 
                 avancar(); 
                 continue; 
@@ -226,7 +223,7 @@ public final class Varredura {
 
             recuperarErroModoPanico(ini, lin, col, c);
         }
-        // EOF
-        lerEOF(ini, lin, col);
+        // EOF: posicionado no fim do texto, com lexema vazio.
+        lerEOF(posicao, linha, coluna);
     }
 }
