@@ -175,14 +175,17 @@ public final class Varredura {
         registrarErro(ini, posicao, lin, col, "Caractere inválido '" + invalido + "'");
     }
 
+    private void lerEOF(int ini, int lin, int col){
+        criarToken("EOF", ini, lin, col, "-");
+    }
+
     //Simula o AFD escolhendo o caminho pelo primeiro caractere.
     public void executar() {
+        char c = atual(); 
+        int ini = posicao;
+        int lin = linha;
+        int col = coluna;
         while(posicao < tamanho) {
-            char c = atual(); 
-            int ini = posicao;
-            int lin = linha;
-            int col = coluna;
-
             if(Character.isWhitespace(c)){ 
                 avancar(); 
                 continue; 
@@ -219,5 +222,7 @@ public final class Varredura {
 
             recuperarErroModoPanico(ini, lin, col, c);
         }
+        // EOF
+        lerEOF(ini, lin, col);
     }
 }
