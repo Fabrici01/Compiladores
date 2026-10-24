@@ -1,6 +1,5 @@
 import java.util.*;
 
-// Aviso para instrução composta somente por um ID.
 public final class RegraInstrucaoSemEfeito implements RegraAviso {
     private static final Set<String> TOKENS_ANTES_DE_INSTRUCAO = Set.of(";", "BEGIN", "THEN", "ELSE", "DO", "REPEAT");
 

@@ -1,6 +1,5 @@
 import java.util.*;
 
-// Aviso para constante repetida dentro de uma enumeração.
 public final class RegraEnumeracaoDuplicada implements RegraAviso {
 
     @Override

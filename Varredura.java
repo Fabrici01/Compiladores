@@ -223,7 +223,7 @@ public final class Varredura {
 
             recuperarErroModoPanico(ini, lin, col, c);
         }
-        // EOF: posicionado no fim do texto, com lexema vazio.
+        // EOF
         lerEOF(posicao, linha, coluna);
     }
 }

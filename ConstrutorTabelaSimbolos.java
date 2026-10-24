@@ -1,6 +1,5 @@
 import java.util.*;
 
-// Responsável por montar a tabela de símbolos.
 public final class ConstrutorTabelaSimbolos {
     
     public List<Simbolo> construir(List<Token> tokens){

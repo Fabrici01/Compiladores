@@ -4,7 +4,7 @@ import javax.swing.SwingUtilities;
 public class Aplicacao {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            AnalisadorLexico analisador = new AnalisadorLexicoPascalino(
+            AnalisadorLexico analisador = new AnalisadorLexico(
                 List.of(new RegraInstrucaoSemEfeito(), new RegraEnumeracaoDuplicada()),
                         new ConstrutorTabelaSimbolos());
             JanelaPrincipal janela = new JanelaPrincipal();

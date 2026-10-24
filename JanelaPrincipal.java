@@ -5,7 +5,6 @@ import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 
-// View passiva só exibe e encaminha eventos ao Presenter.
 public final class JanelaPrincipal implements VisaoEditor, VisaoResultados {
     private static final int ATRASO_ANALISE_MS = 150;
     private final JFrame janela = new JFrame("Pascalino IDE — analisador léxico");
