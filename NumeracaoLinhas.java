@@ -25,7 +25,8 @@ public final class NumeracaoLinhas extends JComponent implements DocumentListene
     public Dimension getPreferredSize(){
         FontMetrics fm = getFontMetrics(getFont());
         int digitos = String.valueOf(totalLinhas()).length();
-        return new Dimension(fm.charWidth('0') * Math.max(digitos, 2) + 2 * MARGEM, 1);
+        int altura = Math.max(editor.getPreferredSize().height, 1);
+        return new Dimension(fm.charWidth('0') * Math.max(digitos, 2) + 2 * MARGEM, altura);
     }
 
     @Override 
