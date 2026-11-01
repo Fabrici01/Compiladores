@@ -30,7 +30,7 @@ public class AnalisadorSintatico {
     }
 
     private void avancaToken(){
-        if (!devolveTokenAtual().getTipo().equals("EOF")){
+        if (!verificarTipo("EOF")){
             indice++;
         }
     }
@@ -57,14 +57,19 @@ public class AnalisadorSintatico {
 
     private void  sincronizar(){
         if(panico){
-            while(!pertence(SINCRONIZA) && !devolveTokenAtual().getTipo().equals("EOF")){
+            while(!pertence(SINCRONIZA) && !verificarTipo("EOF")){
                 avancaToken();
             }
         }
     }
 
+    private boolean verificarTipo(String tipo) {
+        return devolveTokenAtual().getTipo().equals(tipo);
+    }
+
     private boolean match(String tipo){
-        if(devolveTokenAtual().getTipo().equals(tipo)){
+        if(verificarTipo(tipo)){
+            panico = false;
             avancaToken();
             return true;
         } else {
