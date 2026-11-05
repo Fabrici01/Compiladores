@@ -200,6 +200,138 @@ public class AnalisadorSintatico {
         profundidade--;
     }
 
+    // bloco -> 'BEGIN' instrucoes 'END' ';'
+    private void bloco() {
+        match("BEGIN");
+        instrucoes();
+        match("END");
+        match(";");
+    }
+
+    // instrucoes -> (inst)*   (para em END, UNTIL ou fim do arquivo)
+    private void instrucoes() {
+        boolean descartou = false;
+        while (!ehFim() && !verificarTipo("END") && !verificarTipo("UNTIL")) {
+            if (pertence(INICIO_INSTRUCAO)) {
+                if (descartou) {
+                    panico = false;      // depois de descartar lixo, o próximo erro real deve aparecer
+                    descartou = false;
+                }
+                int antes = indice;
+                inst();
+                if (indice == antes) {
+                    avancaToken();       // trava de segurança: toda volta precisa consumir token
+                }
+            } else {
+                reportarErro("token inesperado " + descricaoAtual());
+                avancaToken();
+                descartou = true;
+            }
+        }
+    }
+
+    // inst: controla a profundidade e delega ao corpo
+    private void inst() {
+        if (!entrar()) {
+            profundidade--;
+            return;
+        }
+        instCorpo();
+        profundidade--;
+    }
+
+    private void instCorpo() {
+        if (verificarTipo("ID")) {
+            Token id = devolveTokenAtual();
+            avancaToken();
+            instResto(id);
+        } else if (verificarTipo("IF")) {
+            avancaToken();
+            expr();
+            match("THEN");
+            inst();
+            if (verificarTipo("ELSE")) {   // ELSE pertence ao IF mais próximo
+                avancaToken();
+                inst();
+            }
+        } else if (verificarTipo("WHILE")) {
+            avancaToken();
+            expr();
+            match("DO");
+            inst();
+        } else if (verificarTipo("REPEAT")) {
+            avancaToken();
+            instrucoes();
+            match("UNTIL");
+            expr();
+            match(";");
+        } else if (verificarTipo("FOR")) {
+            avancaToken();
+            match("ID");
+            match(":=");
+            expr();
+            if (verificarTipo("TO") || verificarTipo("DOWNTO")) {
+                avancaToken();
+            } else {
+                reportarErro("esperado 'TO' ou 'DOWNTO', encontrado " + descricaoAtual());
+            }
+            expr();
+            match("DO");
+            inst();
+        } else if (verificarTipo("BREAK") || verificarTipo("CONTINUE")) {
+            avancaToken();
+            match(";");
+        } else if (verificarTipo("BEGIN")) {
+            bloco();
+        } else {
+            reportarErro("esperado uma instrução, encontrado " + descricaoAtual());
+        }
+    }
+
+    // instResto: o que vem depois de "ID" no começo de uma instrução
+    private void instResto(Token id) {
+        if (verificarTipo(":=")) {               // x := expr ;
+            avancaToken();
+            expr();
+            match(";");
+        } else if (verificarTipo("[")) {         // v[i] := expr ;
+            avancaToken();
+            expr();
+            match("]");
+            match(":=");
+            expr();
+            match(";");
+        } else if (verificarTipo(".")) {         // r.campo := expr ;
+            avancaToken();
+            match("ID");
+            match(":=");
+            expr();
+            match(";");
+        } else if (verificarTipo("(")) {         // f(a, b) ;
+            avancaToken();
+            parametros2();
+            match(")");
+            match(";");
+        } else if (verificarTipo(";")) {         // só o identificador: não tem efeito
+            avancaToken();
+            registrarAviso(id, "Instrução com somente o identificador '" + id.getLexema() + "' não tem efeito");
+        } else {
+            reportarErro("esperado ':=', '[', '.', '(' ou ';', encontrado " + descricaoAtual());
+            sincronizar();
+        }
+    }
+
+    // parametros2 -> (expr (',' expr)*)?   argumentos de uma chamada
+    private void parametros2() {
+        if (pertence(INICIO_EXPRESSAO)) {
+            expr();
+            while (verificarTipo(",")) {
+                avancaToken();
+                expr();
+            }
+        }
+    }
+
     private void programa(){} //FAZER DPS
 
     public List<Mensagem> analisar() {
