@@ -332,15 +332,25 @@ public class AnalisadorSintatico {
         }
     }
 
+    private void tipo(){
+        if(verificarTipo("INTEGER") || verificarTipo("REAL") || verificarTipo("CHAR") || verificarTipo("STRING") || verificarTipo("ID")){
+            panico = false;
+            avancaToken();
+        }else{
+            reportarErro("esperado um tipo (INTEGER, REAL, CHAR, STRING ou ID), encontrado " + descricaoAtual());
+            sincronizar();
+        }
+    }
+
     private void programa(){} //FAZER DPS
 
     public List<Mensagem> analisar() {
-    if (tokens.isEmpty()) {
-        return new ArrayList<>();
+        if (tokens.isEmpty()) {
+            return new ArrayList<>();
+        }
+        programa();
+        List<Mensagem> todas = new ArrayList<>(erros);
+        todas.addAll(avisos);
+        return todas;
     }
-    programa();
-    List<Mensagem> todas = new ArrayList<>(erros);
-    todas.addAll(avisos);
-    return todas;
-}
 }
