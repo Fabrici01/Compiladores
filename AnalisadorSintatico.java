@@ -342,6 +342,27 @@ public class AnalisadorSintatico {
         }
     }
 
+    private void conjuntoIds(){
+        while(verificarTipo(",")){
+            match(",");
+            match("ID");
+        }
+    }
+
+    private void declVar(){
+        match("ID");
+        conjuntoIds();
+        match(":");
+        tipo();
+        match(";");
+    }
+
+    private void declVarList(){
+        while(verificarTipo("ID")){
+            declVar();
+        }
+    }
+
     private void programa(){} //FAZER DPS
 
     public List<Mensagem> analisar() {
