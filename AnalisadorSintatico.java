@@ -363,6 +363,124 @@ public class AnalisadorSintatico {
         }
     }
 
+    private void declaracaoVariavel(){
+        if(verificarTipo("VAR")){
+            match("VAR");
+            declVarList();
+        }
+    }
+
+    private void corpoTipo(){
+        if(verificarTipo("(")){
+            match("(");
+            match("ID");
+            conjuntoIds();
+            match(")");
+        }else if(verificarTipo("RECORD")){
+            match("RECORD");
+            declVarList();
+            match("END");
+        }else{
+            reportarErro("esperado '(' ou RECORD, encontrado " + descricaoAtual());
+            sincronizar();
+        }
+    }
+
+    private void declTipoList(){
+        while(verificarTipo("ID")){
+            match("ID");
+            match("=");
+            corpoTipo();
+            match(";");
+        }
+    }
+
+    private void declaracaoTipos(){
+        if(verificarTipo("TYPE")){
+            match("TYPE");
+            declTipoList();
+        }
+    }
+
+    private void declConsResto(){
+        if(verificarTipo(":")){
+            match(":");
+            tipo();
+            match("=");
+            valor();
+            match(";");
+        }else if(verificarTipo("=")){
+            match("=");
+            valor();
+            match(";");
+        }else{
+            reportarErro("Esperava : ou = e encontrou " + descricaoAtual());
+            sincronizar();
+        }
+    }
+
+    private void declConsList(){
+        while(verificarTipo("ID")){
+            match("ID");
+            declConsResto();
+        }
+    }
+
+    private void declaracaoConsts(){
+        if(verificarTipo("CONST")){
+            match("CONST");
+            declConsList();
+        }
+    }
+
+    private void valor(){
+        unario();
+    }
+
+    private void parametros(){
+        declVarList();
+    }
+
+    private void declProc(){
+        if(verificarTipo("PROCEDURE")){
+            match("PROCEDURE");
+            match("ID");
+            match("(");
+            parametros();
+            match(")");
+            match(";");
+            declaracaoVariavel();
+            bloco();
+        }else if(verificarTipo("FUNCTION")){
+            match("FUNCTION");
+            match("ID");
+            match("(");
+            parametros();
+            match(")");
+            match(":");
+            tipo();
+            match(";");
+            declaracaoVariavel();
+            bloco();
+        }else{
+            reportarErro("Esperado PROCEDURE ou FUNCTION, encontrado " + descricaoAtual());
+            sincronizar();
+        }
+    }
+
+    private void declProcs(){
+        while(verificarTipo("PROCEDURE") || verificarTipo("FUNCTION")){
+            declProc();
+        }
+    }
+
+    private void declaracoes(){
+        declaracaoTipos();
+        declaracaoVariavel();
+        declaracaoConsts();
+        declProcs();
+    }
+
     private void programa(){} //FAZER DPS
 
     public List<Mensagem> analisar() {
