@@ -481,7 +481,20 @@ public class AnalisadorSintatico {
         declProcs();
     }
 
-    private void programa(){} //FAZER DPS
+    private void programa(){
+        match("PROGRAM");
+        match("ID");
+        match(";");
+        declaracoes();
+        match("BEGIN");
+        instrucoes();
+        match("END");
+        match(".");
+        // Exigência extra: nada pode sobrar depois do '.'
+        if (!ehFim()) {
+            reportarErro("texto inesperado depois do fim do programa");
+        }
+    }
 
     public List<Mensagem> analisar() {
         if (tokens.isEmpty()) {
