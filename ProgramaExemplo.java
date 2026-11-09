@@ -1,24 +1,33 @@
 public final class ProgramaExemplo {
     static final String TEXTO = """
-        program Demo;
-        type
-          cor = (vermelho, verde, azul, verde);
-          ponto = record
-            x, y : integer;
-          end;
-        var soma, i : integer;
-            p : ponto;
-            c : cor;
-        const max = 10;
-        { comentário de bloco }
-        begin
-          soma := 0;
-          p.x := 3;
-          for i := 1 to max do
-            soma := soma + i;   // soma acumulada
-          soma;
-          Valor_Muito_Longo_Demais := 3;
-          x := 5 $ 2;
-        end.
+       program demo;
+       type
+        dia = (seg, ter, qua, ter);
+        aluno = record
+          nome, nota, : integer;
+        end;
+
+      var a, b, contador : integer;
+          al : aluno;
+          d : dia;
+      const limite = 5;
+      { comentario de bloco }
+      begin
+      a := 0;
+      al.nota := 7;
+      while a < limite do
+        a := a + 1;     // incrementa
+      b := a # 3;
+      Identificador_Extremamente_Longo_Demais_Para_O_Lexico := 1;
+      if a > 2
+        b := 10
+      else
+        b := ;
+      contador := (a + b;
+      a + b;
+      c := 'texto sem fim;
+      b := 3 @ 4;
+      b := 12abc;
+    end.
         """;
 }
