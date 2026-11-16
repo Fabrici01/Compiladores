@@ -37,6 +37,17 @@ public class TabelaSimbolos{
         return false;
     }
 
+    public boolean inserirNoGlobal(Simbolo simbolo){
+        Map<String, Simbolo> escopoGlobal = this.pilhaEscopo.getLast();
+
+        if(!escopoGlobal.containsKey(normaliza(simbolo.getNome()))){
+            escopoGlobal.put(normaliza(simbolo.getNome()), simbolo);
+            return true;
+        }
+
+        return false;
+    }
+
     public Simbolo buscar(String nome){
         for(Map<String, Simbolo> m : this.pilhaEscopo){
             if(m.containsKey(normaliza(nome))){

@@ -384,7 +384,7 @@ public class AnalisadorSintatico {
         return nomes;
     }
 
-    private void declVar(){
+    private void declVar(Categoria categoria){
         List<Token> nomes = new ArrayList<>();
         Token tokenAtual = devolveTokenAtual();
 
@@ -397,25 +397,28 @@ public class AnalisadorSintatico {
         Tipo tipoAtual = tipo();
 
         for(Token t : nomes){
-            Simbolo simbolo = new Simbolo(t.getLexema(), Categoria.VARIAVEL, tipoAtual, t.getLinha());
-            if(!tabelaSimbolo.inserir(simbolo)){
-                registrarErroSemantico(t,  t.getLexema() + " já declarado");
+            if(categoria != null){
+                Simbolo simbolo = new Simbolo(t.getLexema(), categoria, tipoAtual, t.getLinha());
+
+                if(!tabelaSimbolo.inserir(simbolo)){
+                    registrarErroSemantico(t,  t.getLexema() + " já declarado");
+                }
             }
         }
 
         match(";");
     }
 
-    private void declVarList(){
+    private void declVarList(Categoria categoria){
         while(verificarTipo("ID")){
-            declVar();
+            declVar(categoria);
         }
     }
 
     private void declaracaoVariavel(){
         if(verificarTipo("VAR")){
             match("VAR");
-            declVarList();
+            declVarList(Categoria.VARIAVEL);
         }
     }
 
@@ -427,7 +430,7 @@ public class AnalisadorSintatico {
             match(")");
         }else if(verificarTipo("RECORD")){
             match("RECORD");
-            declVarList();
+            declVarList(null);
             match("END");
         }else{
             reportarErro("esperado '(' ou RECORD, encontrado " + descricaoAtual());
@@ -487,30 +490,48 @@ public class AnalisadorSintatico {
     }
 
     private void parametros(){
-        declVarList();
+        declVarList(Categoria.PARAMETRO);
     }
 
     private void declProc(){
         if(verificarTipo("PROCEDURE")){
             match("PROCEDURE");
-            match("ID");
+            Token tokenNome = devolveTokenAtual();
+            tabelaSimbolo.abrirEscopo();
+
+            if(match("ID")){
+                if(!tabelaSimbolo.inserirNoGlobal(new Simbolo(tokenNome.getLexema(), Categoria.PROCEDIMENTO, Tipo.VAZIO, tokenNome.getLinha()))){
+                    registrarErroSemantico(tokenNome, tokenNome.getLexema() + " já declarado");
+                }
+            }
+
             match("(");
             parametros();
             match(")");
             match(";");
             declaracaoVariavel();
             bloco();
+
+            tabelaSimbolo.fecharEscopo();
         }else if(verificarTipo("FUNCTION")){
             match("FUNCTION");
-            match("ID");
+            Token tokenNome = devolveTokenAtual();
+            tabelaSimbolo.abrirEscopo();
+            boolean bool = match("ID");
             match("(");
             parametros();
             match(")");
             match(":");
-            tipo();
+            Tipo tipoFuncao = tipo();
             match(";");
+            if(bool){
+                if(!tabelaSimbolo.inserirNoGlobal(new Simbolo(tokenNome.getLexema(), Categoria.FUNCAO, tipoFuncao, tokenNome.getLinha()))){
+                    registrarErroSemantico(tokenNome, tokenNome.getLexema() + " já declarado");
+                }
+            }
             declaracaoVariavel();
             bloco();
+            tabelaSimbolo.fecharEscopo();
         }else{
             reportarErro("Esperado PROCEDURE ou FUNCTION, encontrado " + descricaoAtual());
             sincronizar();
