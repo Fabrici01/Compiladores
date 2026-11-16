@@ -15,6 +15,7 @@ public class AnalisadorSintatico {
     private static Set<String> OPERADORES_RELACIONAIS = Set.of("=", "<>", "<", "<=", ">", ">=");
     private static Set<String> SINCRONIZA = Set.of(";", ")", "]", ",", "THEN", "DO", "TO", "DOWNTO",
         "BEGIN", "END", "VAR", "CONST", "TYPE", "PROCEDURE", "FUNCTION", "IF", "WHILE", "FOR", "REPEAT", "UNTIL");
+    private final TabelaSimbolos tabelaSimbolo = new TabelaSimbolos();
 
     public AnalisadorSintatico(List<Token> tokens, List<Mensagem> mensagensLexicas) {
         this.tokens = tokens;
@@ -41,6 +42,10 @@ public class AnalisadorSintatico {
 
     private void registrarErroSintatico(Token t, String texto) {
         erros.add(new Mensagem(t.getInicio(), t.getFim(), t.getLinha(), t.getColuna(), Severidade.ERRO, texto, "Erro Sintático"));
+    }
+
+    private void registrarErroSemantico(Token t, String texto) {
+        erros.add(new Mensagem(t.getInicio(), t.getFim(), t.getLinha(), t.getColuna(), Severidade.ERRO, texto, "Erro Semântico"));
     }
 
     private void registrarAviso(Token t, String texto) {
@@ -77,7 +82,7 @@ public class AnalisadorSintatico {
     registrarErroSintatico(t, texto);
 }
 
-    private void  sincronizar(){
+    private void sincronizar(){
         if(panico){
             while(!pertence(SINCRONIZA) && !verificarTipo("EOF")){
                 avancaToken();
@@ -332,28 +337,72 @@ public class AnalisadorSintatico {
         }
     }
 
-    private void tipo(){
-        if(verificarTipo("INTEGER") || verificarTipo("REAL") || verificarTipo("CHAR") || verificarTipo("STRING") || verificarTipo("ID")){
+    private Tipo tipo(){
+        if(verificarTipo("INTEGER")){
             panico = false;
             avancaToken();
-        }else{
-            reportarErro("esperado um tipo (INTEGER, REAL, CHAR, STRING ou ID), encontrado " + descricaoAtual());
-            sincronizar();
+
+            return Tipo.INTEGER;
+        }else if(verificarTipo("REAL")){
+            panico = false;
+            avancaToken();
+
+            return Tipo.REAL;
+        }else if(verificarTipo("CHAR")){
+            panico = false;
+            avancaToken();
+
+            return Tipo.CHAR;
+        }else if(verificarTipo("STRING") ){
+            panico = false;
+            avancaToken();
+
+            return Tipo.STRING;
+        }else if(verificarTipo("ID")){
+            panico = false;
+            avancaToken();
+
+            return Tipo.ERRO;  //Provisório
         }
+
+        reportarErro("esperado um tipo (INTEGER, REAL, CHAR, STRING ou ID), encontrado " + descricaoAtual());
+        sincronizar();
+        return Tipo.ERRO;
     }
 
-    private void conjuntoIds(){
+    private List<Token> conjuntoIds(){
+        List<Token> nomes = new ArrayList<>();
+
         while(verificarTipo(",")){
             match(",");
-            match("ID");
+            Token tokenAtual = devolveTokenAtual();
+            if(match("ID")){
+                nomes.add(tokenAtual);
+            }
         }
+
+        return nomes;
     }
 
     private void declVar(){
-        match("ID");
-        conjuntoIds();
+        List<Token> nomes = new ArrayList<>();
+        Token tokenAtual = devolveTokenAtual();
+
+        if(match("ID")){
+            nomes.add(tokenAtual);
+        }
+
+        nomes.addAll(conjuntoIds());
         match(":");
-        tipo();
+        Tipo tipoAtual = tipo();
+
+        for(Token t : nomes){
+            Simbolo simbolo = new Simbolo(t.getLexema(), Categoria.VARIAVEL, tipoAtual, t.getLinha());
+            if(!tabelaSimbolo.inserir(simbolo)){
+                registrarErroSemantico(t,  t.getLexema() + " já declarado");
+            }
+        }
+
         match(";");
     }
 

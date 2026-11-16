@@ -37,7 +37,7 @@ public class TabelaSimbolos{
         return false;
     }
 
-    public EntradaSimbolo buscar(String nome){
+    public Simbolo buscar(String nome){
         for(Map<String, Simbolo> m : this.pilhaEscopo){
             if(m.containsKey(normaliza(nome))){
                 return m.get(normaliza(nome));
