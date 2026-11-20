@@ -127,82 +127,137 @@ public class AnalisadorSintatico {
     }
 
     // fator -> '(' expr ')' | ID varResto | NUM | LITERAL
-    private void fator() {
+    private Tipo fator() {
         if (verificarTipo("(")) {
             avancaToken();
-            expr();
+            Tipo tipoExpr = expr();
             match(")");
+
+            return tipoExpr;
         } else if (verificarTipo("ID")) {
+            Token id = devolveTokenAtual();
             avancaToken();
-            varResto();
-        } else if (verificarTipo("NUM") || verificarTipo("LITERAL")) {
+
+            Tipo base;
+            Simbolo simbolo = tabelaSimbolo.buscar(id.getLexema());
+
+            if(simbolo == null){
+                registrarErroSemantico(id, "'" + id.getLexema() + "' não declarado");
+                base = Tipo.ERRO;
+            }else{
+                base = simbolo.getTipo();
+            }
+
+            return varResto(base);
+        } else if (verificarTipo("NUM")) {
+            Token num = devolveTokenAtual();
             avancaToken();
+
+            if (num.getLexema().contains(".")) {
+                return Tipo.REAL;
+            }
+
+            return Tipo.INTEGER;
+
+            } else if (verificarTipo("LITERAL")) {
+                Token literal = devolveTokenAtual();
+                avancaToken();
+
+                if (literal.getAtributo().length() == 1){
+                    return Tipo.CHAR;
+                }
+
+                return Tipo.STRING;
         } else {
             reportarErro("esperado uma expressão, encontrado " + descricaoAtual());
             sincronizar();
         }
+
+        return Tipo.ERRO;
     }
 
     // varResto -> '[' exprOp ']' | '.' ID | vazio
-    private void varResto() {
+    private Tipo varResto(Tipo base) {
         if (verificarTipo("[")) {
+            Token abre = devolveTokenAtual();
             avancaToken();
             exprOp();
             match("]");
-        } else if (verificarTipo(".")) {
+
+            if (base == Tipo.ERRO){
+                return Tipo.ERRO;
+            }
+
+            if (base == Tipo.STRING){
+                return Tipo.CHAR;
+            }
+
+            registrarErroSemantico(abre, "valor do tipo " + base + " não pode ser indexado");
+            return Tipo.ERRO;
+
+        }else if (verificarTipo(".")) {
             avancaToken();
             match("ID");
+            return Tipo.ERRO; //Provisório
         }
-        // vazio: não consome nada
+
+        return base;
     }
 
     // unario -> ('+' | '-')? fator
-    private void unario() {
+    private Tipo unario() {
         if (verificarTipo("+") || verificarTipo("-")) {
             avancaToken();
         }
-        fator();
+        return fator();
     }
 
     // termo -> unario (('*' | '/') unario)*
-    private void termo() {
-        unario();
+    private Tipo termo() {
+        Tipo tipoTermo = unario();
         while (verificarTipo("*") || verificarTipo("/")) {
             avancaToken();
             unario();
         }
+
+        return tipoTermo;
     }
 
     // exprOp -> termo (('+' | '-') termo)*
-    private void exprOp() {
-        termo();
+    private Tipo exprOp() {
+        Tipo tipoExprOp = termo();
         while (verificarTipo("+") || verificarTipo("-")) {
             avancaToken();
             termo();
         }
+
+        return tipoExprOp;
     }
 
     // exprComp -> exprOp (operadorRelacional exprOp)*
-    private void exprComp() {
-        exprOp();
+    private Tipo exprComp() {
+        Tipo tipoComp = exprOp();
         while (pertence(OPERADORES_RELACIONAIS)) {
             avancaToken();
             exprOp();
         }
+
+        return tipoComp;
     }
 
     // expr -> exprComp (('OU' | 'E') exprComp)*
-    private void expr() {
+    private Tipo expr() {
         if (!entrar()) {
             profundidade--;
-            return;
+            return Tipo.ERRO;
         }
-        exprComp();
+        Tipo tipoExpr = exprComp();
         while (verificarTipo("OU") || verificarTipo("E")) {
             avancaToken();
             exprComp();
         }
         profundidade--;
+        return tipoExpr;
     }
 
     // bloco -> 'BEGIN' instrucoes 'END' ';'
